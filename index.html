@@ -1,0 +1,192 @@
+<html>
+    <head>
+    <title>Sorting Time</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="main">
+            <div class="input">
+            <input type="text" id="arrayinput"></input>
+            <button id="insertion" onclick="doInsertion()">Insertion sort</button>
+            <button id="pancake" onclick="doPancake()">Pancake sort</button>
+        </div>
+        <div id="canvasHolder">
+        <canvas id="canvas"></canvas>
+        </div>
+    </body>
+    <script>
+    //uncomment this if you want to use an example
+    // const array = [63,13,33,69,5,3,16,13];
+    // const length = array.length;
+    
+    //Store the "history" of each sorting system as well as som ofi "object of interest" 
+    let actionsPancake = [];
+    let ofiPancake = [];
+
+    let actionsInsert = [];
+    let ofiInsert = [];
+    let sorted;
+    
+    //comment this if you want to use an example
+    let array = [];
+    let length;
+
+    function doInsertion(){
+        parseInput();
+        insertionSort(array.slice(),length.valueOf());
+    }
+    function doPancake(){
+        parseInput();
+        pancakeSort(array.slice(),length.valueOf());
+    }
+    function parseInput() {
+        let input = document.getElementById("arrayinput").value;
+        stringArr = input.split(",");
+        array = stringArr.map((i) => Number(i));
+        length = array.length;
+        drawArray(array,length);
+    }
+    //Insertion sort
+        function insertionSort(array, length){
+        let temp;
+        let j;
+        for(let i = 1;i < length;i++){
+            //Saves actions and ofi
+            ofiInsert.push(i);
+            actionsInsert.push(array.slice());
+
+            temp = array[i];
+            j = i - 1;
+            while(temp < array[j] && j >= 0){
+                array[j+1] = array[j];
+                j--;
+            }
+            array[j+1] = temp;
+
+            //Saves actions and ofi
+            ofiInsert.push(j+1);
+            actionsInsert.push(array.slice());
+        }
+        doCoolAnimationsInsertion();
+
+    }
+    //Pancake Sort
+    function pancakeSort(array,length){
+        for(let currSize = length;currSize > 1; currSize--) {
+            let maxIndex = findIndexOfMax(array,currSize);
+            if(maxIndex != currSize-1) {
+                //Saves actions and ofi
+                actionsPancake.push(array.slice());
+                ofiPancake.push(maxIndex);
+                ofiPancake.push(0);
+
+                flip(array,maxIndex);
+
+                //Saves actions and ofi
+                actionsPancake.push(array.slice());
+                ofiPancake.push(0);
+                ofiPancake.push(maxIndex);
+                //Saves actions and ofi
+                actionsPancake.push(array.slice());
+                ofiPancake.push(currSize-1);
+                ofiPancake.push(0);
+
+                flip(array,currSize-1);
+                //Saves actions and ofi
+                actionsPancake.push(array.slice());
+                ofiPancake.push(0);
+                ofiPancake.push(currSize-1);
+
+            }
+        }
+        actionsPancake.push(array.slice());
+        doCoolAnimationsPancake();
+        }
+        function flip(array,i){
+            let start = 0;
+            while (start < i){
+                [array[start], array[i]] = [array[i], array[start]];
+                start++;
+                i--;
+            }
+        }
+        function findIndexOfMax(array,length){
+            let maxIndex = 0;
+            for(let i = 0;i < length;i++) {
+                if(array[i] > array[maxIndex]) {
+                    maxIndex = i;
+                }
+            }
+            return maxIndex;
+        }
+    //End pancake sort
+
+    //Epic Graphix
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    setupCanvas(canvas);
+
+    function setupCanvas(){
+    canvas.width = document.getElementById("canvasHolder").clientWidth;
+    canvas.height = 500;
+    }
+
+    //Highligts sorted elements with red and "current" with blue
+    function doCoolAnimationsInsertion(){
+        for (let x = 0;x < actionsInsert.length;x++) {
+            setTimeout(function(){ 
+            drawArray(actionsInsert[x],length);
+            if (x%2 == 0) {
+                for (let i = 0;i <= ofiInsert[x]; i++) {
+                    fillNumberRed(actionsInsert[x][i],i);
+                }
+            }
+            else {
+                for (let i = 0;i <= ofiInsert[x-1]; i++) {
+                    fillNumberRed(actionsInsert[x][i],i);
+                }
+            }
+            fillNumberBlue(actionsInsert[x][ofiInsert[x]],ofiInsert[x])
+            //removes colors
+            if (x == actionsInsert.length-1) {
+                drawArray(actionsInsert[x],actionsInsert.length);
+            }
+        }, 1000*x);
+        }
+    }
+    //Hightligts first and last elements of the part of the array that is swapping
+    function doCoolAnimationsPancake(){
+        for (let x = 0;x < actionsPancake.length;x++) {
+        setTimeout(function(){ 
+            drawArray(actionsPancake[x],length);
+            fillNumberRed(actionsPancake[x][ofiPancake[2*x]],ofiPancake[2*x]);
+            fillNumberBlue(actionsPancake[x][ofiPancake[2*x+1]],ofiPancake[2*x+1])
+        }, 1000*x);
+        //removes colors
+        if (x == actionsPancake.length-1) {
+                drawArray(actionsPancake[x],actionsPancake.length);
+        }
+    }
+    }
+
+
+    function drawArray(array,len) {
+        clearCanvas();
+        for(let i = 0;i < len;i++) {
+            ctx.strokeRect(i*30,0,30,array[i]*5);
+        }
+    };
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function fillNumberRed(value, index){
+        ctx.fillStyle = "#FF0000";
+        ctx.fillRect(index*30,0,30,value*5);
+    }
+    function fillNumberBlue(value, index){
+        ctx.fillStyle = "#0000FF";
+        ctx.fillRect(index*30,0,30,value*5);
+    }
+    </script>
+</html>
