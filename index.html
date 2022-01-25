@@ -5,19 +5,19 @@
     </head>
     <body>
         <div class="main">
+            <div id="explanation">Skriv nummer i rutan separerade med kommatecken (ex 54,23,12,4,7,23) och behold budget animations! Disclaimer: tal över 100 ser likadana ut</div>
             <div class="input">
             <input type="text" id="arrayinput"></input>
             <button id="insertion" onclick="doInsertion()">Insertion sort</button>
             <button id="pancake" onclick="doPancake()">Pancake sort</button>
+            <input type="range" min="1" max="1000" value="500" class="slider" id="myRange">
+            <div style="display: inline;">Speed 100ms-1000ms</div>
         </div>
         <div id="canvasHolder">
         <canvas id="canvas"></canvas>
         </div>
     </body>
     <script>
-    //uncomment this if you want to use an example
-    // const array = [63,13,33,69,5,3,16,13];
-    // const length = array.length;
     
     //Store the "history" of each sorting system as well as som ofi "object of interest" 
     let actionsPancake = [];
@@ -26,10 +26,10 @@
     let actionsInsert = [];
     let ofiInsert = [];
     let sorted;
-    
-    //comment this if you want to use an example
+    //some declarations
     let array = [];
     let length;
+    let time;
 
     function doInsertion(){
         parseInput();
@@ -40,11 +40,23 @@
         pancakeSort(array.slice(),length.valueOf());
     }
     function parseInput() {
+        clear();
         let input = document.getElementById("arrayinput").value;
+        time = document.getElementById("myRange").value;
+        console.log(time);
         stringArr = input.split(",");
         array = stringArr.map((i) => Number(i));
         length = array.length;
         drawArray(array,length);
+    }
+    function clear() {
+        actionsPancake = [];
+        ofiPancake = [];
+        actionsInsert = [];
+        ofiInsert = [];
+        sorted = 0;
+        array = [];
+        length = 0;
     }
     //Insertion sort
         function insertionSort(array, length){
@@ -102,6 +114,7 @@
         actionsPancake.push(array.slice());
         doCoolAnimationsPancake();
         }
+
         function flip(array,i){
             let start = 0;
             while (start < i){
@@ -152,7 +165,7 @@
             if (x == actionsInsert.length-1) {
                 drawArray(actionsInsert[x],actionsInsert.length);
             }
-        }, 1000*x);
+        }, time*x);
         }
     }
     //Hightligts first and last elements of the part of the array that is swapping
@@ -162,7 +175,7 @@
             drawArray(actionsPancake[x],length);
             fillNumberRed(actionsPancake[x][ofiPancake[2*x]],ofiPancake[2*x]);
             fillNumberBlue(actionsPancake[x][ofiPancake[2*x+1]],ofiPancake[2*x+1])
-        }, 1000*x);
+        }, time*x);
         //removes colors
         if (x == actionsPancake.length-1) {
                 drawArray(actionsPancake[x],actionsPancake.length);
